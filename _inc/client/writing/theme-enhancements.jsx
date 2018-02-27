@@ -12,7 +12,7 @@ import analytics from 'lib/analytics';
  */
 import { FormFieldset, FormLabel, FormLegend } from 'components/forms';
 import { ModuleToggle } from 'components/module-toggle';
-import { getModule } from 'state/modules';
+import { getModule, getModuleOverride } from 'state/modules';
 import { currentThemeSupports } from 'state/initial-state';
 import { isModuleFound } from 'state/search';
 import { ModuleSettingsForm as moduleSettingsForm } from 'components/module-settings/module-settings-form';
@@ -103,6 +103,78 @@ class ThemeEnhancements extends React.Component {
 		wp_mobile_app_promos: this.props.getOptionValue( 'wp_mobile_app_promos', 'minileven' )
 	};
 
+	renderInfiniteScroll = () => {
+		if ( ! this.props.isModuleFound( 'infinite-scroll' ) ) {
+			return null;
+		}
+
+		const infiniteScroll = this.props.getModule( 'infinite-scroll' );
+		const override = this.props.getModuleOverride( 'infinite-scroll' );
+		infiniteScroll.radios = [
+			{
+				key: 'infinite_default',
+				label: __( 'Load more posts using the default theme behavior' ),
+				disabled: !! override
+			},
+			{
+				key: 'infinite_button',
+				label: __( 'Load more posts in page with a button' ),
+				disabled: 'inactive' === override
+			},
+			{
+				key: 'infinite_scroll',
+				label: __( 'Load more posts as the reader scrolls down' ),
+				disabled: 'inactive' === override
+			}
+		];
+
+		let content = null;
+		if ( ! this.props.isInfiniteScrollSupported ) {
+			// TODO: Properly translate this string
+			content = (
+				<span>
+					{ __( 'Theme support required.' ) + ' ' }
+					<a onClick={ this.trackLearnMoreIS } href={ infiniteScroll.learn_more_button + '#theme' } title={ __( 'Learn more about adding support for Infinite Scroll to your theme.' ) }>
+						{ __( 'Learn more' ) }
+					</a>
+				</span>
+			);
+		} else {
+			content = ( 'inactive' === override )
+				? (
+					<span>
+						{ __( 'Infinite Scroll has been disabled by another plugin.' ) }
+					</span>
+				)
+				: infiniteScroll.radios.map( radio => {
+					return (
+						<FormLabel key={ `${ infiniteScroll.module }_${ radio.key }` }>
+							<input
+								type="radio"
+								name="infinite_mode"
+								value={ radio.key }
+								checked={ radio.key === this.state.infinite_mode }
+								disabled={ this.props.isSavingAnyOption( [ infiniteScroll.module, radio.key ] ) || radio.disabled }
+								onChange={ () => this.updateInfiniteMode( radio.key ) }
+							/>
+							<span className="jp-form-toggle-explanation">
+								{ radio.label }
+							</span>
+						</FormLabel>
+					);
+				} );
+		}
+
+		return (
+			<SettingsGroup hasChild module={ { module: infiniteScroll.module } } key={ `theme_enhancement_${ infiniteScroll.module }` } support={ infiniteScroll.learn_more_button }>
+				<FormLegend className="jp-form-label-wide">
+					{ infiniteScroll.name }
+				</FormLegend>
+				{ content }
+			</SettingsGroup>
+		);
+	}
+
 	render() {
 		const foundInfiniteScroll = this.props.isModuleFound( 'infinite-scroll' ),
 			foundMinileven = this.props.isModuleFound( 'minileven' );
@@ -117,75 +189,7 @@ class ThemeEnhancements extends React.Component {
 				header={ __( 'Theme enhancements' ) }
 				hideButton={ ! foundInfiniteScroll || ! this.props.isInfiniteScrollSupported }
 				>
-				{
-					foundInfiniteScroll && (
-						[ {
-							...this.props.getModule( 'infinite-scroll' ),
-							radios: [
-								{
-									key: 'infinite_default',
-									label: __( 'Load more posts using the default theme behavior' )
-								},
-								{
-									key: 'infinite_button',
-									label: __( 'Load more posts in page with a button' )
-								},
-								{
-									key: 'infinite_scroll',
-									label: __( 'Load more posts as the reader scrolls down' )
-								}
-							]
-						} ].map( item => {
-							if ( ! this.props.isModuleFound( item.module ) ) {
-								return null;
-							}
-
-							return (
-								<SettingsGroup hasChild module={ { module: item.module } } key={ `theme_enhancement_${ item.module }` } support={ item.learn_more_button }>
-									<FormLegend className="jp-form-label-wide">
-										{
-											item.name
-										}
-									</FormLegend>
-									{
-										this.props.isInfiniteScrollSupported
-										? item.radios.map( radio => {
-											return (
-												<FormLabel key={ `${ item.module }_${ radio.key }` }>
-													<input
-														type="radio"
-														name="infinite_mode"
-														value={ radio.key }
-														checked={ radio.key === this.state.infinite_mode }
-														disabled={ this.props.isSavingAnyOption( [ item.module, radio.key ] ) }
-														onChange={ () => this.updateInfiniteMode( radio.key ) }
-													/>
-													<span className="jp-form-toggle-explanation">
-														{
-															radio.label
-														}
-													</span>
-												</FormLabel>
-											);
-										} )
-										: (
-											<span>
-												{
-													__( 'Theme support required.' ) + ' '
-												}
-												<a onClick={ this.trackLearnMoreIS } href={ item.learn_more_button + '#theme' } title={ __( 'Learn more about adding support for Infinite Scroll to your theme.' ) }>
-													{
-														__( 'Learn more' )
-													}
-												</a>
-											</span>
-										)
-									}
-								</SettingsGroup>
-							);
-						} )
-					)
-				}
+				{ this.renderInfiniteScroll() }
 				{
 					foundMinileven && (
 						[ {
@@ -261,7 +265,8 @@ export default connect(
 		return {
 			module: ( module_name ) => getModule( state, module_name ),
 			isInfiniteScrollSupported: currentThemeSupports( state, 'infinite-scroll' ),
-			isModuleFound: ( module_name ) => isModuleFound( state, module_name )
+			isModuleFound: ( module_name ) => isModuleFound( state, module_name ),
+			getModuleOverride: ( module_name ) => getModuleOverride( state, module_name )
 		};
 	}
 )( moduleSettingsForm( ThemeEnhancements ) );
