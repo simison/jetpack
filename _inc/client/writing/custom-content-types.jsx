@@ -47,7 +47,7 @@ export class CustomContentTypes extends React.Component {
 
 		const module = this.props.module( 'custom-content-types' );
 		const disabledByOverride = ( 'inactive' === this.props.getModuleOverride( 'custom-content-types' ) );
-		const disabledReason = disabledByOverride && __( 'This feature has been disabled by 3rd-party code.' );
+		const disabledReason = disabledByOverride && __( 'This feature has been disabled by another plugin.' );
 		return (
 			<SettingsCard
 				{ ...this.props }

@@ -64,11 +64,11 @@ class ModuleToggleComponent extends Component {
 		const override = this.props.getModuleOverride( this.props.slug );
 		switch ( override ) {
 			case 'active':
-				return __( 'This feature has been enabled by 3rd-party code.' );
+				return __( 'This feature has been enabled by another plugin.' );
 			case 'inactive':
-				return __( 'This feature has been disabled by 3rd-party code.' );
+				return __( 'This feature has been disabled by another plugin.' );
 			default:
-				return __( 'This feature is being managed by 3rd-party code.' );
+				return __( 'This feature is being managed by another plugin.' );
 		}
 	};
 
