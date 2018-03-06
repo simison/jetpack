@@ -3208,9 +3208,6 @@ p {
 	 * Attempts Jetpack registration.  If it fail, a state flag is set: @see ::admin_page_load()
 	 */
 	public static function try_registration() {
-		// The user has agreed to the TOS at some point by now.
-		Jetpack_Options::update_option( 'tos_agreed', true );
-
 		// Let's get some testing in beta versions and such.
 		if ( self::is_development_version() && defined( 'PHP_URL_HOST' ) ) {
 			// Before attempting to connect, let's make sure that the domains are viable.
@@ -3993,6 +3990,8 @@ p {
 				check_admin_referer( 'jetpack-register' );
 				Jetpack::log( 'register' );
 				Jetpack::maybe_set_version_option();
+				// The user has agreed to the TOS at some point by now.
+				Jetpack_Options::update_option( 'tos_agreed', true );
 				$registered = Jetpack::try_registration();
 				if ( is_wp_error( $registered ) ) {
 					$error = $registered->get_error_code();
