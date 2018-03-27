@@ -215,10 +215,9 @@ gulp.task( 'react:analyze', function( done ) {
 	const config = getWebpackConfig();
 
 	webpack( config ).run( function( err, stats ) {
-		const statsJson = stats.toJson( {
-			assets: false,
-			hash: true
-		} );
+		// https://webpack.js.org/api/node/#stats-object
+		// https://webpack.js.org/configuration/stats/
+		const statsJson = stats.toJson();
 		fs.writeFile( './stats.json', JSON.stringify( statsJson ), {}, done );
 	} );
 } );
