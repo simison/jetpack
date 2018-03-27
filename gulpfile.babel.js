@@ -219,7 +219,7 @@ gulp.task( 'react:analyze', function( done ) {
 			assets: false,
 			hash: true
 		} );
-		fs.writeFile( './stats.json', statsJson.toString(), {}, done );
+		fs.writeFile( './stats.json', JSON.stringify( statsJson ), {}, done );
 	} );
 } );
 
