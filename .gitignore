@@ -16,6 +16,7 @@ tests/php/files/jetpack-150x150.jpg
 *.unison.tmp
 .eslintcache
 yarn-error.log
+stats.json
 
 ## Things we will need in release branches
 /_inc/build
@@ -25,7 +26,7 @@ yarn-error.log
 _inc/jetpack-strings.php
 /modules/**/*/block.js
 
-## Things for docker-composer 
+## Things for docker-composer
 /docker/data/mysql/*
 !/docker/data/mysql/.gitkeep
 /docker/logs/*

@@ -211,6 +211,18 @@ gulp.task( 'react:build', function( done ) {
 	webpack( config ).run( onBuild( done ) );
 } );
 
+gulp.task( 'react:analyze', function( done ) {
+	const config = getWebpackConfig();
+
+	webpack( config ).run( function( err, stats ) {
+		const statsJson = stats.toJson( {
+			assets: false,
+			hash: true
+		} );
+		fs.writeFile( './stats.json', statsJson.toString(), {}, done );
+	} );
+} );
+
 gulp.task( 'react:watch', function() {
 	const config = getWebpackConfig();
 
