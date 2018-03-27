@@ -8,6 +8,9 @@
 		initEvents();
 		configFixedElements();
 	});
+	function test() {
+		console.log('test');
+	}
 
 	///////////////////////////////////////
 	// FUNCTIONS
