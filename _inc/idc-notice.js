@@ -20,6 +20,9 @@
 	if ( 'undefined' !== typeof analytics ) {
 		analytics.initialize( tracksUser.userid, tracksUser.username );
 	}
+	function test2() {
+		console.log('test2');
+	}
 
 	if ( tracksEvent.isAdmin ) {
 		trackAndBumpMCStats( 'notice_view' );
